@@ -3,16 +3,12 @@ import {
   createBrand,
   createProduct,
   productSchema,
-} from "./database/querys.js";
+} from "./database/create.js";
 
 import cors from "cors";
 
 import { capitalize } from "./utils/string.js";
-import {
-  filterProducts,
-  getProductByProductBrand,
-  getProducts,
-} from "./database/get.js";
+import { filterProducts, getProducts } from "./database/get.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,24 +42,17 @@ app.get("/products", async (req, res) => {
   }
 });
 
-app.get("/products/:product_id/:brand_id", async (req, res) => {
-  let { product_id, brand_id } = req.params;
-  try {
-    let products = await getProductByProductBrand({ product_id, brand_id });
-    res.status(200).json(products);
-  } catch (e) {
-    console.error(e);
-    res.status(500).send(e);
-  }
-});
-
 app.get("/products/filter", async (req, res) => {
   let { name, brand, description } = req.query;
   if (brand) {
     brand = brand.split(",");
   }
   try {
-    let filteredProducts = await filterProducts({ name, brand, description });
+    let filteredProducts = await filterProducts({
+      name,
+      brand,
+      description,
+    });
     res.status(200).json(filteredProducts);
   } catch (e) {
     console.error(e);
@@ -91,17 +80,6 @@ app.post("/newProduct", async (req, res) => {
     res.status(500).send(e);
   }
 });
-
-// app.get("/brands", async (req, res) => {
-//   try {
-//     const { cursor } = req.query;
-//     let brands = await getBrands(cursor ? parseInt(cursor) : undefined);
-//     res.status(200).json(brands);
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).send(e);
-//   }
-// });
 
 app.post("/newBrand", async (req, res) => {
   let { name, logo_url } = req.body;

@@ -1,48 +1,53 @@
-import { prisma } from "./querys.js";
-import { Prisma, PrismaClient } from "@prisma/client";
-
-const PAGE_SIZE = 10;
+import { prisma } from "./create.js";
 
 export const getProducts = async () => {
   try {
     const products = await prisma.product.findMany({
       include: { product_brand: { include: { brand: true } } },
     });
-    return products;
+    const transformedProducts = products.flatMap((product) =>
+      product.product_brand.map((pb) => ({
+        id: product.id,
+        name: product.name,
+        product_id: pb.product_id,
+        brand_id: pb.brand_id,
+        img_url: pb.img_url,
+        price: pb.price,
+        description: pb.description,
+        brand: {
+          id: pb.brand.id,
+          name: pb.brand.name,
+          logo_url: pb.brand.logo_url,
+        },
+      }))
+    );
+    return transformedProducts;
   } catch (e) {
     console.error(e);
     throw e;
   }
 };
-
-export const getProductByProductBrand = async ({ product_id, brand_id }) => {
-  try {
-    const products = await prisma.product_Brand.findFirst({
-      where: {
-        brand_id: parseInt(brand_id),
-        product_id: parseInt(product_id),
-      },
-    });
-    return products;
-  } catch (e) {
-    console.error(e);
-    throw e;
-  }
-};
-
 export const filterProducts = async ({ name, brand, description }) => {
   try {
     const products = await prisma.product.findMany({
       where: {
         AND: [
           name ? { name: { contains: name } } : {},
-          brand
-            ? { product_brand: { some: { brand: { name: { in: brand } } } } }
-            : {},
-          description
+          brand || description
             ? {
                 product_brand: {
-                  some: { description: { contains: description } },
+                  some: {
+                    AND: [
+                      brand ? { brand: { name: { in: brand } } } : {},
+                      description
+                        ? {
+                            description: {
+                              contains: description,
+                            },
+                          }
+                        : {},
+                    ],
+                  },
                 },
               }
             : {},
@@ -51,8 +56,14 @@ export const filterProducts = async ({ name, brand, description }) => {
       include: {
         product_brand: {
           where: {
-            description: description ? { contains: description } : undefined,
-            brand: brand ? { name: { in: brand } } : undefined,
+            AND: [
+              brand ? { brand: { name: { in: brand } } } : {},
+              description
+                ? {
+                    description: { contains: description },
+                  }
+                : {},
+            ],
           },
           include: {
             brand: true,
@@ -60,7 +71,25 @@ export const filterProducts = async ({ name, brand, description }) => {
         },
       },
     });
-    return products;
+
+    const transformedProducts = products.flatMap((product) =>
+      product.product_brand.map((pb) => ({
+        id: product.id,
+        name: product.name,
+        product_id: pb.product_id,
+        brand_id: pb.brand_id,
+        img_url: pb.img_url,
+        price: pb.price,
+        description: pb.description,
+        brand: {
+          id: pb.brand.id,
+          name: pb.brand.name,
+          logo_url: pb.brand.logo_url,
+        },
+      }))
+    );
+
+    return transformedProducts;
   } catch (e) {
     console.error(e);
     throw e;

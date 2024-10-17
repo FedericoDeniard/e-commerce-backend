@@ -2,7 +2,6 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { BrandSchema } from "./get.js";
 
 export const prisma = new PrismaClient();
-const PAGE_SIZE = 10;
 
 type ProductBrandSchema = {
   product_id: number;
