@@ -1,17 +1,14 @@
 import express from "express";
 import {
   createBrand,
-  getBrands,
   createProduct,
   productSchema,
-  getProductsByFilters,
-  getProductByString,
-  getProductByProductBrand,
-} from "./database/querys.js";
+} from "./database/create.js";
 
 import cors from "cors";
 
 import { capitalize } from "./utils/string.js";
+import { filterProducts, getProducts } from "./database/get.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,57 +32,33 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+app.get("/products", async (req, res) => {
+  try {
+    let products = await getProducts();
+    res.status(200).json(products);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json(e);
+  }
 });
 
-// app.get("/products", async (req, res) => {
-//   const { brand_name, product_name, description, all } = req.query;
-//   const brandNamesArray = brand_name ? brand_name.split(",") : undefined;
-
-//   try {
-//     let products = await getProductsByFilters(
-//       brandNamesArray,
-//       product_name,
-//       description,
-//       all
-//     );
-//     res.status(200).json(products);
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).json(e);
-//   }
-// });
-
-app.get("/products/:product_id/:brand_id", async (req, res) => {
-  let { product_id, brand_id } = req.params;
+app.get("/products/filter", async (req, res) => {
+  let { name, brand, description } = req.query;
+  if (brand) {
+    brand = brand.split(",");
+  }
   try {
-    let products = await getProductByProductBrand({ product_id, brand_id });
-    res.status(200).json(products);
+    let filteredProducts = await filterProducts({
+      name,
+      brand,
+      description,
+    });
+    res.status(200).json(filteredProducts);
   } catch (e) {
     console.error(e);
     res.status(500).send(e);
   }
 });
-
-// app.get(
-//   "/products/:brand_name?/:product_name?/:description?/",
-//   async (req, res) => {
-//     const { brand_name, product_name, description } = req.query;
-//     const brandNamesArray = brand_name ? brand_name.split(",") : undefined;
-//     try {
-//       const products = await getProductsByFilters(
-//         brandNamesArray,
-//         product_name,
-//         description
-//       );
-//       res.status(200).json(products);
-//     } catch (e) {
-//       console.error(e);
-//       res.status(500).send(e);
-//     }
-//   }
-// );
 
 app.post("/newProduct", async (req, res) => {
   let { name, description, img_url, brand_name, price } = req.body;
@@ -102,17 +75,6 @@ app.post("/newProduct", async (req, res) => {
   try {
     const newProduct = await createProduct(product, brand_name);
     res.status(201).json(newProduct);
-  } catch (e) {
-    console.error(e);
-    res.status(500).send(e);
-  }
-});
-
-app.get("/brands", async (req, res) => {
-  try {
-    const { cursor } = req.query;
-    let brands = await getBrands(cursor ? parseInt(cursor) : undefined);
-    res.status(200).json(brands);
   } catch (e) {
     console.error(e);
     res.status(500).send(e);
