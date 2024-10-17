@@ -11,13 +11,11 @@ datasource db {
 }
 
 model Product {
-  id          Int    @id @default(autoincrement())
-  name        String @unique
-  description String
-  img_url     String
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
   brands        Brand[]
-  Product_Brand Product_Brand[]
+  product_brand Product_Brand[]
 }
 
 model Brand {
@@ -26,14 +24,17 @@ model Brand {
   logo_url String
 
   products      Product[]
-  Product_Brand Product_Brand[]
+  product_brand Product_Brand[]
 }
 
 model Product_Brand {
-  product    Product @relation(fields: [product_id], references: [id])
-  product_id Int
-  brand      Brand   @relation(fields: [brand_id], references: [id])
-  brand_id   Int
+  product     Product @relation(fields: [product_id], references: [id])
+  product_id  Int
+  brand       Brand   @relation(fields: [brand_id], references: [id])
+  brand_id    Int
+  img_url     String
+  price       Float
+  description String
 
   @@id([product_id, brand_id])
 }
