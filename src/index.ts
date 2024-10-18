@@ -43,14 +43,18 @@ app.get("/products", async (req, res) => {
 });
 
 app.get("/products/filter", async (req, res) => {
-  let { name, brand, description, model, id } = req.query;
-  if (brand) {
-    brand = brand.split(",");
-  }
+  let { name, brand, description, model, id } = req.query as {
+    name?: string;
+    brand?: string;
+    description?: string;
+    model?: string;
+    id?: number;
+  };
+  let brandArray = brand.split(",");
   try {
     let filteredProducts = await filterProducts({
       name,
-      brand,
+      brand: brandArray,
       description,
       model,
       id,
@@ -64,11 +68,11 @@ app.get("/products/filter", async (req, res) => {
 
 app.get("/products/:id/:brand/:model", async (req, res) => {
   let { id, brand, model } = req.params;
-  brand = [brand];
+  let brandArray = brand.split(",");
   try {
     const filteredProducts = await filterProducts({
       id: parseInt(id),
-      brand,
+      brand: brandArray,
       model,
     });
     res.status(200).json(filteredProducts);
