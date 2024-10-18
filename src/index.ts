@@ -43,7 +43,7 @@ app.get("/products", async (req, res) => {
 });
 
 app.get("/products/filter", async (req, res) => {
-  let { name, brand, description } = req.query;
+  let { name, brand, description, model } = req.query;
   if (brand) {
     brand = brand.split(",");
   }
@@ -52,6 +52,7 @@ app.get("/products/filter", async (req, res) => {
       name,
       brand,
       description,
+      model,
     });
     res.status(200).json(filteredProducts);
   } catch (e) {
