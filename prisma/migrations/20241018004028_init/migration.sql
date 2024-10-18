@@ -15,11 +15,12 @@ CREATE TABLE "Brand" (
 CREATE TABLE "Product_Brand" (
     "product_id" INTEGER NOT NULL,
     "brand_id" INTEGER NOT NULL,
+    "model" TEXT NOT NULL,
     "img_url" TEXT NOT NULL,
     "price" REAL NOT NULL,
     "description" TEXT NOT NULL,
 
-    PRIMARY KEY ("product_id", "brand_id"),
+    PRIMARY KEY ("product_id", "brand_id", "model"),
     CONSTRAINT "Product_Brand_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Product_Brand_brand_id_fkey" FOREIGN KEY ("brand_id") REFERENCES "Brand" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
