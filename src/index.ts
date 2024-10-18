@@ -43,15 +43,37 @@ app.get("/products", async (req, res) => {
 });
 
 app.get("/products/filter", async (req, res) => {
-  let { name, brand, description } = req.query;
-  if (brand) {
-    brand = brand.split(",");
-  }
+  let { name, brand, description, model, id } = req.query as {
+    name?: string;
+    brand?: string;
+    description?: string;
+    model?: string;
+    id?: number;
+  };
+  let brandArray = brand.split(",");
   try {
     let filteredProducts = await filterProducts({
       name,
-      brand,
+      brand: brandArray,
       description,
+      model,
+      id,
+    });
+    res.status(200).json(filteredProducts);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send(e);
+  }
+});
+
+app.get("/products/:id/:brand/:model", async (req, res) => {
+  let { id, brand, model } = req.params;
+  let brandArray = brand.split(",");
+  try {
+    const filteredProducts = await filterProducts({
+      id: parseInt(id),
+      brand: brandArray,
+      model,
     });
     res.status(200).json(filteredProducts);
   } catch (e) {
@@ -61,19 +83,20 @@ app.get("/products/filter", async (req, res) => {
 });
 
 app.post("/newProduct", async (req, res) => {
-  let { name, description, img_url, brand_name, price } = req.body;
-  name = capitalize(name);
-  brand_name = capitalize(brand_name);
+  const { name, brand_name, product_brand } = req.body;
+
   const product: productSchema = {
     name,
-    description,
-    img_url,
-    price,
-    product_brand: [],
+    product_brand: product_brand.map((brand) => ({
+      model: brand.model,
+      img_url: brand.img_url,
+      price: brand.price,
+      description: brand.description,
+    })),
   };
 
   try {
-    const newProduct = await createProduct(product, brand_name);
+    const newProduct = await createProduct(product, brand_name); // Asegúrate de pasar también brand_name
     res.status(201).json(newProduct);
   } catch (e) {
     console.error(e);

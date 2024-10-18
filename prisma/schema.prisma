@@ -32,9 +32,17 @@ model Product_Brand {
   product_id  Int
   brand       Brand   @relation(fields: [brand_id], references: [id])
   brand_id    Int
+  model       String
   img_url     String
   price       Float
   description String
 
-  @@id([product_id, brand_id])
+  @@id([product_id, brand_id, model])
+}
+
+model user {
+  id       Int    @id @default(autoincrement())
+  username String
+  password String
+  role     String
 }

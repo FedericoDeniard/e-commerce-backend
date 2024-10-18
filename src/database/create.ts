@@ -4,62 +4,62 @@ import { BrandSchema } from "./get.js";
 export const prisma = new PrismaClient();
 
 type ProductBrandSchema = {
-  product_id: number;
-  brand_id: number;
-};
-export type productSchema = {
-  name: string;
-  description: string;
+  model: string;
   img_url: string;
   price: number;
-  product_brand: ProductBrandSchema[];
+  description: string;
 };
 
+export type productSchema = {
+  name: string;
+  product_brand: ProductBrandSchema[];
+};
 export const createProduct = async (
   product: productSchema,
   brand_name: string
 ) => {
-  let brand;
   try {
-    brand = await prisma.brand.findUnique({
+    const brand = await prisma.brand.findUnique({
       where: { name: brand_name },
     });
+
     if (!brand) {
       throw new Error("Brand not found");
     }
-    let existingProduct = await prisma.product.findUnique({
+
+    const existingProduct = await prisma.product.findUnique({
       where: { name: product.name },
     });
+
+    const productBrandData = {
+      description: product.product_brand[0].description,
+      img_url: product.product_brand[0].img_url,
+      price: product.product_brand[0].price,
+      model: product.product_brand[0].model,
+    };
+
     if (existingProduct) {
-      const updatedProduct = await prisma.product_Brand.create({
+      return await prisma.product_Brand.create({
         data: {
           product: { connect: { id: existingProduct.id } },
           brand: { connect: { id: brand.id } },
-          description: product.description,
-          img_url: product.img_url,
-          price: product.price,
+          ...productBrandData,
         },
         include: { product: true, brand: true },
       });
-      return updatedProduct;
     } else {
       const newProduct = await prisma.product.create({
-        data: {
-          name: product.name,
-          product_brand: {
-            create: [
-              {
-                brand: { connect: { id: brand.id } },
-                description: product.description,
-                img_url: product.img_url,
-                price: product.price,
-              },
-            ],
-          },
-        },
-        include: { product_brand: true },
+        data: { name: product.name },
       });
-      return newProduct;
+
+      return await prisma.product_Brand.create({
+        data: {
+          product: { connect: { id: newProduct.id } },
+          brand: { connect: { id: brand.id } },
+          ...productBrandData,
+        },
+        include: { product: true, brand: true },
+      });
     }
   } catch (e) {
     console.error(e);

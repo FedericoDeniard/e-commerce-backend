@@ -14,6 +14,7 @@ export const getProducts = async () => {
         img_url: pb.img_url,
         price: pb.price,
         description: pb.description,
+        model: pb.model,
         brand: {
           id: pb.brand.id,
           name: pb.brand.name,
@@ -27,13 +28,26 @@ export const getProducts = async () => {
     throw e;
   }
 };
-export const filterProducts = async ({ name, brand, description }) => {
+export const filterProducts = async ({
+  name,
+  brand,
+  description,
+  model,
+  id,
+}: {
+  name?: string;
+  brand?: string[];
+  description?: string;
+  model?: string;
+  id?: number;
+}) => {
   try {
     const products = await prisma.product.findMany({
       where: {
         AND: [
           name ? { name: { contains: name } } : {},
-          brand || description
+          id ? { id } : {},
+          brand || description || model
             ? {
                 product_brand: {
                   some: {
@@ -46,6 +60,7 @@ export const filterProducts = async ({ name, brand, description }) => {
                             },
                           }
                         : {},
+                      model ? { model: { contains: model } } : {},
                     ],
                   },
                 },
@@ -63,6 +78,7 @@ export const filterProducts = async ({ name, brand, description }) => {
                     description: { contains: description },
                   }
                 : {},
+              model ? { model: { contains: model } } : {},
             ],
           },
           include: {
@@ -81,6 +97,7 @@ export const filterProducts = async ({ name, brand, description }) => {
         img_url: pb.img_url,
         price: pb.price,
         description: pb.description,
+        model: pb.model,
         brand: {
           id: pb.brand.id,
           name: pb.brand.name,
