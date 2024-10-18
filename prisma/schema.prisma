@@ -39,3 +39,10 @@ model Product_Brand {
 
   @@id([product_id, brand_id, model])
 }
+
+model user {
+  id       Int    @id @default(autoincrement())
+  username String
+  password String
+  role     String
+}
