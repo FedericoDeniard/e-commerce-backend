@@ -28,12 +28,25 @@ export const getProducts = async () => {
     throw e;
   }
 };
-export const filterProducts = async ({ name, brand, description, model }) => {
+export const filterProducts = async ({
+  name,
+  brand,
+  description,
+  model,
+  id,
+}: {
+  name?: string;
+  brand?: string[];
+  description?: string;
+  model?: string;
+  id?: number;
+}) => {
   try {
     const products = await prisma.product.findMany({
       where: {
         AND: [
           name ? { name: { contains: name } } : {},
+          id ? { id } : {},
           brand || description || model
             ? {
                 product_brand: {
