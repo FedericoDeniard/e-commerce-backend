@@ -9,11 +9,24 @@ import cors from "cors";
 
 import { capitalize } from "./utils/string.js";
 import { filterProducts, getProducts } from "./database/get.js";
+import { checkUser, createToken } from "./utils/validation.js";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+import { deleteProduct } from "./database/delete.js";
+import { authMiddleware } from "./utils/middleware.js";
+import { modifyProduct } from "./database/update.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const corsOptions = {
+  origin: true,
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 const whitelist = ["http://localhost:5173"];
 // const corsOptions = {
@@ -25,12 +38,6 @@ const whitelist = ["http://localhost:5173"];
 //     }
 //   },
 // };
-
-const corsOptions = {
-  origin: true,
-};
-
-app.use(cors(corsOptions));
 
 app.get("/products", async (req, res) => {
   try {
@@ -96,7 +103,7 @@ app.post("/newProduct", async (req, res) => {
   };
 
   try {
-    const newProduct = await createProduct(product, brand_name); // Asegúrate de pasar también brand_name
+    const newProduct = await createProduct(product, brand_name);
     res.status(201).json(newProduct);
   } catch (e) {
     console.error(e);
@@ -116,6 +123,63 @@ app.post("/newBrand", async (req, res) => {
   }
 });
 
+app.post("/login", async (req, res) => {
+  try {
+    let { username, password } = req.body;
+
+    let user = await checkUser(username, password);
+    if (!user) {
+      res.status(401).send("Invalid credentials");
+      return;
+    }
+
+    const token = createToken({ id: user.id, role: user.role });
+
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      })
+      .status(200)
+      .send(user);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send(e);
+  }
+});
+
+app.get("/checkToken", authMiddleware, async (req, res) => {
+  const { id, role } = req.user;
+  res.status(200).json({ id, role });
+});
+
+app.post("/removeProduct", authMiddleware, async (req, res) => {
+  let { id, brand_id, model }: { id: number; brand_id: number; model: string } =
+    req.body;
+
+  try {
+    const deletedProduct = await deleteProduct({ id, brand_id, model });
+    res.status(200).json(deletedProduct);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send(e);
+  }
+});
+
+app.post("/modifyProduct", authMiddleware, async (req, res) => {
+  let { originalProduct, modifiedProduct } = req.body;
+  try {
+    const updatedProduct = await modifyProduct({
+      originalProduct,
+      modifiedProduct,
+    });
+    res.status(200).json(updatedProduct);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send(e);
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`Example app listening at http://localhost:${PORT}`);
+  console.log(`App listening at http://localhost:${PORT}`);
 });
