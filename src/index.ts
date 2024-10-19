@@ -2,13 +2,14 @@ import express from "express";
 import {
   createBrand,
   createProduct,
+  prisma,
   productSchema,
 } from "./database/create.js";
 
 import cors from "cors";
 
 import { capitalize } from "./utils/string.js";
-import { filterProducts, getProducts } from "./database/get.js";
+import { filterProducts, findProducts, getProducts } from "./database/get.js";
 import { checkUser, createToken } from "./utils/validation.js";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
@@ -49,29 +50,32 @@ app.get("/products", async (req, res) => {
   }
 });
 
-app.get("/products/filter", async (req, res) => {
-  let { name, brand, description, model, id } = req.query as {
-    name?: string;
-    brand?: string;
-    description?: string;
-    model?: string;
-    id?: number;
-  };
-  let brandArray = brand.split(",");
-  try {
-    let filteredProducts = await filterProducts({
-      name,
-      brand: brandArray,
-      description,
-      model,
-      id,
-    });
-    res.status(200).json(filteredProducts);
-  } catch (e) {
-    console.error(e);
-    res.status(500).send(e);
-  }
-});
+// app.get("/products/filter", async (req, res) => {
+//   let { name, brand, description, model, id } = req.query as {
+//     name?: string;
+//     brand?: string;
+//     description?: string;
+//     model?: string;
+//     id?: number;
+//   };
+//   let brandArray = [];
+//   if (brand) {
+//     brandArray = brand.split(",");
+//   }
+//   try {
+//     let filteredProducts = await filterProducts({
+//       name,
+//       brand: brandArray,
+//       description,
+//       model,
+//       id,
+//     });
+//     res.status(200).json(filteredProducts);
+//   } catch (e) {
+//     console.error(e);
+//     res.status(500).send(e);
+//   }
+// });
 
 app.get("/products/:id/:brand/:model", async (req, res) => {
   let { id, brand, model } = req.params;
@@ -177,6 +181,26 @@ app.post("/modifyProduct", authMiddleware, async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).send(e);
+  }
+});
+
+app.get("/products/filter", async (req, res) => {
+  let { name, brand, description } = req.query as {
+    name?: string;
+    brand?: string;
+    description?: string;
+  };
+
+  const brandsArray = brand
+    ? brand.split(",").map((brand) => brand.trim())
+    : undefined;
+
+  try {
+    const products = await findProducts(name, brandsArray, description);
+    res.status(200).json(products);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al buscar productos" });
   }
 });
 
