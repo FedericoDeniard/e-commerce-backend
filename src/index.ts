@@ -21,10 +21,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? "https://federicodeniard.github.io"
-      : "http://localhost:3000",
+  origin: "*",
+  // process.env.NODE_ENV === "production"
+  //   ? "https://federicodeniard.github.io"
+  //   : "http://localhost:3000",
   credentials: true,
 };
 
