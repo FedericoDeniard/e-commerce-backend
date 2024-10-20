@@ -9,7 +9,7 @@ import {
 import cors from "cors";
 
 import { capitalize } from "./utils/string.js";
-import { filterProducts, findProducts, getProducts } from "./database/get.js";
+import { filterProducts, getProducts } from "./database/get.js";
 import { checkUser, createToken } from "./utils/validation.js";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
@@ -49,33 +49,6 @@ app.get("/products", async (req, res) => {
     res.status(500).json(e);
   }
 });
-
-// app.get("/products/filter", async (req, res) => {
-//   let { name, brand, description, model, id } = req.query as {
-//     name?: string;
-//     brand?: string;
-//     description?: string;
-//     model?: string;
-//     id?: number;
-//   };
-//   let brandArray = [];
-//   if (brand) {
-//     brandArray = brand.split(",");
-//   }
-//   try {
-//     let filteredProducts = await filterProducts({
-//       name,
-//       brand: brandArray,
-//       description,
-//       model,
-//       id,
-//     });
-//     res.status(200).json(filteredProducts);
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).send(e);
-//   }
-// });
 
 app.get("/products/:id/:brand/:model", async (req, res) => {
   let { id, brand, model } = req.params;
@@ -197,7 +170,11 @@ app.get("/products/filter", async (req, res) => {
     : undefined;
 
   try {
-    const products = await findProducts(name, brandsArray, description);
+    const products = await filterProducts({
+      name,
+      brand: brandsArray,
+      description,
+    });
     res.status(200).json(products);
   } catch (error) {
     console.error(error);
