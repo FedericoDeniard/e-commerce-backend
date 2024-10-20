@@ -12,15 +12,13 @@ type ProductBrandSchema = {
 
 export type productSchema = {
   name: string;
-  product_brand: ProductBrandSchema[];
+  brand_name: string;
+  product_brand: ProductBrandSchema;
 };
-export const createProduct = async (
-  product: productSchema,
-  brand_name: string
-) => {
+export const createProduct = async (product: productSchema) => {
   try {
     const brand = await prisma.brand.findUnique({
-      where: { name: brand_name },
+      where: { name: product.brand_name },
     });
 
     if (!brand) {
@@ -32,10 +30,10 @@ export const createProduct = async (
     });
 
     const productBrandData = {
-      description: product.product_brand[0].description,
-      img_url: product.product_brand[0].img_url,
-      price: product.product_brand[0].price,
-      model: product.product_brand[0].model,
+      description: product.product_brand.description,
+      img_url: product.product_brand.img_url,
+      price: product.product_brand.price,
+      model: product.product_brand.model,
     };
 
     if (existingProduct) {

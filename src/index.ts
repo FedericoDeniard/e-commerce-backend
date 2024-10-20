@@ -98,16 +98,17 @@ app.post("/newProduct", async (req, res) => {
 
   const product: productSchema = {
     name,
-    product_brand: product_brand.map((brand) => ({
-      model: brand.model,
-      img_url: brand.img_url,
-      price: brand.price,
-      description: brand.description,
-    })),
+    brand_name,
+    product_brand: {
+      model: product_brand.model,
+      img_url: product_brand.img_url,
+      price: parseFloat(product_brand.price),
+      description: product_brand.description,
+    },
   };
 
   try {
-    const newProduct = await createProduct(product, brand_name);
+    const newProduct = await createProduct(product);
     res.status(201).json(newProduct);
   } catch (e) {
     console.error(e);
