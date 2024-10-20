@@ -1,12 +1,18 @@
 import { prisma } from "../database/create.js";
 import jwt from "jsonwebtoken";
 export const findUsername = async (username) => {
-    const user = await prisma.user.findUnique({
-        where: {
-            username,
-        },
-    });
-    return user;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                username: username,
+            },
+        });
+        return user;
+    }
+    catch (error) {
+        console.error("Error buscando usuario:", error);
+        throw new Error("Error en la búsqueda de usuario");
+    }
 };
 export const checkUser = async (username, password) => {
     const user = await findUsername(username);
