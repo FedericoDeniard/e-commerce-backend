@@ -26,7 +26,7 @@ const corsOptions = {
     process.env.NODE_ENV === "production"
       ? "https://federicodeniard.github.io"
       : "http://localhost:3000",
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
 
