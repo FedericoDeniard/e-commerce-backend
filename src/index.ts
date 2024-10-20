@@ -16,15 +16,17 @@ import cookieParser from "cookie-parser";
 import { deleteProduct } from "./database/delete.js";
 import { authMiddleware } from "./utils/middleware.js";
 import { modifyProduct } from "./database/update.js";
+import { METHODS } from "http";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin: "*",
-  // process.env.NODE_ENV === "production"
-  //   ? "https://federicodeniard.github.io"
-  //   : "http://localhost:3000",
+  origin:
+    process.env.NODE_ENV === "production"
+      ? "https://federicodeniard.github.io"
+      : "http://localhost:3000",
+  allohedHeaders: "Content-Type",
   credentials: true,
 };
 
