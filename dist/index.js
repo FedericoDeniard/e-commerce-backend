@@ -92,6 +92,8 @@ app.post("/login", async (req, res) => {
             .cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
+            sameSite: "None",
+            maxAge: 1000 * 60 * 60 * 24,
         })
             .status(200)
             .send(user);
