@@ -26,6 +26,14 @@ CREATE TABLE "Product_Brand" (
 );
 
 -- CreateTable
+CREATE TABLE "user" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "role" TEXT NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "_BrandToProduct" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL,
@@ -38,6 +46,9 @@ CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Brand_name_key" ON "Brand"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_username_key" ON "user"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_BrandToProduct_AB_unique" ON "_BrandToProduct"("A", "B");
