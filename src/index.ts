@@ -21,24 +21,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin: true,
+  origin: "https://federicodeniard.github.io",
   credentials: true,
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-
-const whitelist = ["http://localhost:5173"];
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-// };
 
 app.get("/products", async (req, res) => {
   try {
