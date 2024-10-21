@@ -42,4 +42,7 @@ La página cuenta con nueve rutas.
 
 - Archivo de configuración de entorno **.env**: Deberá contener una clave **DATABASE_URL** dónde conectaremos nuestra base de datos postgresql. También deberá contener una clave **JWT_SECRET** que usaremos para firmar los tokens.
 
+  > [!TIP]
+  > Podes usar `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"` para crear una clave segura.
+
 - Correr el proyecto: `npm run dev`: Levantará el proyecto en modo dev, tomando los archivos .env.development que ya se encuentran en el repositorio.
