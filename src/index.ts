@@ -25,7 +25,7 @@ const corsOptions = {
   origin:
     process.env.NODE_ENV === "production"
       ? "https://federicodeniard.github.io"
-      : "http://localhost:3000",
+      : "http://localhost:5173",
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
@@ -111,7 +111,7 @@ app.post("/login", async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 1000 * 60 * 60 * 24,
       })
       .status(200)
@@ -180,4 +180,5 @@ app.get("/products/filter", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
+  console.log(process.env.NODE_ENV === "production");
 });
