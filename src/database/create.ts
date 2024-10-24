@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { BrandSchema } from "./get.js";
 
 export const prisma = new PrismaClient();
