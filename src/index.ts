@@ -122,7 +122,7 @@ app.get("/checkToken", authMiddleware, async (req, res) => {
   res.status(200).json({ id, role });
 });
 
-app.post("/removeProduct", authMiddleware, async (req, res) => {
+app.delete("/removeProduct", authMiddleware, async (req, res) => {
   let { id, brand_id, model }: { id: number; brand_id: number; model: string } =
     req.body;
 
