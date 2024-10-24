@@ -1,9 +1,7 @@
 import express from "express";
-import {
-  createBrand,
-  createProduct,
-  productSchema,
-} from "./database/create.js";
+import { createBrand, createProduct } from "./database/create.js";
+
+import { ProductSchema } from "./types/index.js";
 
 import cors from "cors";
 
@@ -60,7 +58,7 @@ app.get("/products/:id/:brand/:model", async (req, res) => {
 app.post("/newProduct", async (req, res) => {
   const { name, brand_name, product_brand } = req.body;
 
-  const product: productSchema = {
+  const product: ProductSchema = {
     name,
     brand_name,
     product_brand: {
@@ -177,5 +175,4 @@ app.get("/products/filter", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
-  console.log(process.env.NODE_ENV === "production");
 });

@@ -112,8 +112,3 @@ export const filterProducts = async ({
     throw e;
   }
 };
-
-export type BrandSchema = {
-  name: string;
-  logo_url: string;
-};
