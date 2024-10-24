@@ -1,21 +1,13 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import { BrandSchema } from "./get.js";
+import { PrismaClient } from "@prisma/client";
+import {
+  ProductBrandSchema,
+  ProductSchema,
+  BrandSchema,
+} from "../types/index.js";
 
 export const prisma = new PrismaClient();
 
-type ProductBrandSchema = {
-  model: string;
-  img_url: string;
-  price: number;
-  description: string;
-};
-
-export type productSchema = {
-  name: string;
-  brand_name: string;
-  product_brand: ProductBrandSchema;
-};
-export const createProduct = async (product: productSchema) => {
+export const createProduct = async (product: ProductSchema) => {
   try {
     const brand = await prisma.brand.findUnique({
       where: { name: product.brand_name },

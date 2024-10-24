@@ -1,22 +1,17 @@
 import express from "express";
-import {
-  createBrand,
-  createProduct,
-  prisma,
-  productSchema,
-} from "./database/create.js";
+import { createBrand, createProduct } from "./database/create.js";
+
+import { ProductSchema } from "./types/index.js";
 
 import cors from "cors";
 
 import { capitalize } from "./utils/string.js";
 import { filterProducts, getProducts } from "./database/get.js";
 import { checkUser, createToken } from "./utils/validation.js";
-import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { deleteProduct } from "./database/delete.js";
 import { authMiddleware } from "./utils/middleware.js";
 import { modifyProduct } from "./database/update.js";
-import { METHODS } from "http";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -63,7 +58,7 @@ app.get("/products/:id/:brand/:model", async (req, res) => {
 app.post("/newProduct", async (req, res) => {
   const { name, brand_name, product_brand } = req.body;
 
-  const product: productSchema = {
+  const product: ProductSchema = {
     name,
     brand_name,
     product_brand: {
@@ -180,5 +175,4 @@ app.get("/products/filter", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
-  console.log(process.env.NODE_ENV === "production");
 });
